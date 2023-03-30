@@ -40,5 +40,31 @@ namespace EditoraAPI.Service.Services
                 .Include(l => l.Autores)
                 .ToList();
         }
+
+        public Livro GetLivroById(int id)
+        {
+            return _dbContext.livros.FirstOrDefault(x => x.Id == id);
+        }
+
+        public void Delete(int id)
+        {
+            var livro = _dbContext.livros.FirstOrDefault(x => x.Id == id);
+
+            this._dbContext.livros.Remove(livro);
+            this._dbContext.SaveChanges();
+        }
+
+        public void Update(int id, string titulo, string isbn, int ano)
+        {
+            var livro = _dbContext.livros.FirstOrDefault(x => x.Id == id);
+
+            livro.Titulo = titulo;
+            livro.ISBN = isbn;
+            livro.Ano = ano;
+
+            _dbContext.livros.Update(livro);
+            this._dbContext.SaveChanges();
+
+        }
     }
 }
