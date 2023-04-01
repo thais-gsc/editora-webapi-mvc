@@ -1,9 +1,8 @@
-﻿using EditoraAPI.Service.Interfaces;
+﻿using EditoraDomain.Interfaces;
 using EditoraDomain.Entities;
-using EditoraService;
 using Microsoft.EntityFrameworkCore;
 
-namespace EditoraAPI.Service.Services
+namespace EditoraService.Services
 {
     public class AutorService: IAutorService
     {
@@ -33,7 +32,7 @@ namespace EditoraAPI.Service.Services
 
         public Autor GetAutorById(int id)
         {
-            return _dbContext.autores.FirstOrDefault(x => x.Id == id);
+            return _dbContext.autores.Include(a => a.Livros).ToList().FirstOrDefault(x => x.Id == id);
         }
 
         public void Delete(int id)

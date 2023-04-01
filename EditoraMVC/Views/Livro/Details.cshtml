@@ -28,9 +28,32 @@
         <dd class = "col-sm-10">
             @Html.DisplayFor(model => model.Ano)
         </dd>
+        <dt class = "col-sm-2">
+            Autor(es)
+        </dt>
+        <dd class="col-sm-10">
+            @if (Model.Autores == null)
+    {
+        <p>Nenhum autor cadastrado</p>
+    }
+    else
+    {
+        <ul>
+            @foreach (var autor in Model.Autores)
+            {
+                <li>@autor.Nome @autor.Sobrenome</li>
+            }
+        </ul>
+    }
+        </dd>
     </dl>
 </div>
 <div>
     <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+    <a asp-action="Index">Back to List</a> |
+
+    @*<a asp-action="AddAutor" asp-route-id="@Model?.Id">Adicionar autor(es) a este livro</a> 
+
+    A adição não está funcionando
+    *@
 </div>

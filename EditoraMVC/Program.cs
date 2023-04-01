@@ -1,5 +1,7 @@
+using EditoraDomain.Interfaces;
 using EditoraMVC.Data;
 using EditoraService;
+using EditoraService.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,12 +11,15 @@ var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
-builder.Services.AddDbContext<EditoraDbContext>();
+builder.Services.AddDbContext<EditoraDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DatabaseConnection")));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
     .AddEntityFrameworkStores<ApplicationDbContext>();
 builder.Services.AddControllersWithViews();
+
+builder.Services.AddScoped<ILivroService, LivroService>();
+builder.Services.AddScoped<IAutorService, AutorService>();
 
 var app = builder.Build();
 
@@ -40,7 +45,7 @@ app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+    pattern: "{controller=Autor}/{action=Index}/{id?}");
 app.MapRazorPages();
 
 app.Run();

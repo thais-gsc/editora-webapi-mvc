@@ -1,6 +1,6 @@
 ﻿using EditoraDomain.Entities;
 
-namespace EditoraAPI.Service.Interfaces
+namespace EditoraDomain.Interfaces
 {
     public interface IAutorService
     {

@@ -1,9 +1,9 @@
-﻿using EditoraAPI.Service.Interfaces;
+﻿using EditoraDomain.Interfaces;
 using EditoraDomain.Entities;
 using EditoraService;
 using Microsoft.EntityFrameworkCore;
 
-namespace EditoraAPI.Service.Services
+namespace EditoraService.Services
 {
     public class LivroService: ILivroService
     {
@@ -43,7 +43,7 @@ namespace EditoraAPI.Service.Services
 
         public Livro GetLivroById(int id)
         {
-            return _dbContext.livros.FirstOrDefault(x => x.Id == id);
+            return _dbContext.livros.Include(l => l.Autores).ToList().FirstOrDefault(x => x.Id == id);
         }
 
         public void Delete(int id)

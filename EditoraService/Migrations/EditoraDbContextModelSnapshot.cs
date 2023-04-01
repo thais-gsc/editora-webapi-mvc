@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace EditoraAPI.Migrations
+namespace EditoraService.Migrations
 {
     [DbContext(typeof(EditoraDbContext))]
     partial class EditoraDbContextModelSnapshot : ModelSnapshot

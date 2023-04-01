@@ -1,5 +1,5 @@
-﻿using EditoraAPI.Service.Interfaces;
-using EditoraAPI.Service.Services;
+﻿using EditoraDomain.Interfaces;
+using EditoraService.Services;
 using EditoraDomain.Entities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;

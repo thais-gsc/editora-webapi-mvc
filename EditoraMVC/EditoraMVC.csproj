@@ -20,8 +20,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\EditoraAPI\EditoraAPI.csproj" />
     <ProjectReference Include="..\EditoraDomain\EditoraDomain.csproj" />
+    <ProjectReference Include="..\EditoraService\EditoraService.csproj" />
   </ItemGroup>
 
 </Project>

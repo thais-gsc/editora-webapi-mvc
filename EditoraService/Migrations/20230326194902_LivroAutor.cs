@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace EditoraAPI.Migrations
+namespace EditoraService.Migrations
 {
     public partial class LivroAutor : Migration
     {

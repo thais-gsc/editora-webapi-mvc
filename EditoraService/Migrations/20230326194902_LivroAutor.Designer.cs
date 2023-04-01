@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace EditoraAPI.Migrations
+namespace EditoraService.Migrations
 {
     [DbContext(typeof(EditoraDbContext))]
     [Migration("20230326194902_LivroAutor")]

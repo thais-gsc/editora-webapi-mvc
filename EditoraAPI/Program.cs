@@ -1,5 +1,5 @@
-using EditoraAPI.Service.Interfaces;
-using EditoraAPI.Service.Services;
+using EditoraDomain.Interfaces;
+using EditoraService.Services;
 using EditoraService;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
