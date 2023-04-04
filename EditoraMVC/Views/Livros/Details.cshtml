@@ -28,6 +28,12 @@
         <dd class = "col-sm-10">
             @Html.DisplayFor(model => model.Ano)
         </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Capa)
+        </dt>
+        <dd class = "col-sm-10">
+            <img src="@ViewData["imageSrc"]" alt="Imagem do Livro">
+        </dd>
     </dl>
 </div>
 <div>

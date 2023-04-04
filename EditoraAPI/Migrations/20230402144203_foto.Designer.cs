@@ -4,6 +4,7 @@ using EditoraService;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EditoraAPI.Migrations
 {
     [DbContext(typeof(EditoraDbContext))]
-    partial class EditoraDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230402144203_foto")]
+    partial class foto
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -51,9 +53,6 @@ namespace EditoraAPI.Migrations
                     b.Property<string>("Email")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("FotoId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Nome")
                         .HasColumnType("nvarchar(max)");
 
@@ -62,30 +61,7 @@ namespace EditoraAPI.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("FotoId");
-
                     b.ToTable("autores");
-                });
-
-            modelBuilder.Entity("EditoraDomain.Entities.Imagem", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<byte[]>("Bytes")
-                        .IsRequired()
-                        .HasColumnType("varbinary(max)");
-
-                    b.Property<string>("NomeArquivo")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Imagem");
                 });
 
             modelBuilder.Entity("EditoraDomain.Entities.Livro", b =>
@@ -99,9 +75,6 @@ namespace EditoraAPI.Migrations
                     b.Property<int?>("Ano")
                         .HasColumnType("int");
 
-                    b.Property<int>("CapaId")
-                        .HasColumnType("int");
-
                     b.Property<string>("ISBN")
                         .HasColumnType("nvarchar(max)");
 
@@ -109,8 +82,6 @@ namespace EditoraAPI.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("CapaId");
 
                     b.ToTable("livros");
                 });
@@ -128,26 +99,6 @@ namespace EditoraAPI.Migrations
                         .HasForeignKey("LivrosId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("EditoraDomain.Entities.Autor", b =>
-                {
-                    b.HasOne("EditoraDomain.Entities.Imagem", "Foto")
-                        .WithMany()
-                        .HasForeignKey("FotoId");
-
-                    b.Navigation("Foto");
-                });
-
-            modelBuilder.Entity("EditoraDomain.Entities.Livro", b =>
-                {
-                    b.HasOne("EditoraDomain.Entities.Imagem", "Capa")
-                        .WithMany()
-                        .HasForeignKey("CapaId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Capa");
                 });
 #pragma warning restore 612, 618
         }

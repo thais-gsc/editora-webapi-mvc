@@ -7,8 +7,6 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using EditoraDomain.Entities;
 using EditoraService;
-using Newtonsoft.Json;
-using System.Net.Http.Headers;
 
 namespace EditoraMVC.Controllers
 {
@@ -24,19 +22,9 @@ namespace EditoraMVC.Controllers
         // GET: Autors
         public async Task<IActionResult> Index()
         {
-            List<Autor> listaAutores = new List<Autor>();
-
-            using (var httpClient = new HttpClient())
-            {
-                
-                using (var response = await httpClient.GetAsync("https://localhost:7236/api/Autor"))
-                {
-                    string apiResponse = await response.Content.ReadAsStringAsync();
-
-                    listaAutores = JsonConvert.DeserializeObject<List<Autor>>(apiResponse);
-                }
-            }
-            return View(listaAutores);
+            return _context.autores != null ?
+                          View(await _context.autores.ToListAsync()) :
+                          Problem("Entity set 'EditoraDbContext.autores'  is null.");
         }
 
         // GET: Autors/Details/5

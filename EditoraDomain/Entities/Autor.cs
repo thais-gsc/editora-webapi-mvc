@@ -1,4 +1,7 @@
-﻿namespace EditoraDomain.Entities
+﻿using Microsoft.AspNetCore.Http;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace EditoraDomain.Entities
 {
     public class Autor
     {
@@ -13,5 +16,7 @@
         public DateTime? DataNascimento { get; set; }
 
         public ICollection<Livro>? Livros { get; set; }
+
+        public Imagem? Foto { get; set; }
     }
 }
