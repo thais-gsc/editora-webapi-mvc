@@ -7,12 +7,15 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using EditoraDomain.Entities;
 using EditoraService;
+using Microsoft.Data.SqlClient;
+using System.Data;
 
 namespace EditoraMVC.Controllers
 {
     public class AutorsController : Controller
     {
         private readonly EditoraDbContext _context;
+        private readonly string connectionString = "Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=EditoraDatabaseAzure;Integrated Security=True;Connect Timeout=30;Encrypt=False;Trust Server Certificate=False;Application Intent=ReadWrite;Multi Subnet Failover=False";
 
         public AutorsController(EditoraDbContext context)
         {
@@ -20,11 +23,43 @@ namespace EditoraMVC.Controllers
         }
 
         // GET: Autors
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
-            return _context.autores != null ?
-                          View(await _context.autores.ToListAsync()) :
-                          Problem("Entity set 'EditoraDbContext.autores'  is null.");
+            var autores = new List<Autor>();
+
+            using (var connection = new SqlConnection(connectionString))
+            {
+                var procName = "GetAllAutores";
+                var sqlCommand = new SqlCommand(procName, connection);
+
+                sqlCommand.CommandType = CommandType.StoredProcedure;
+
+                try
+                {
+                    connection.Open();
+                    using (var reader = sqlCommand.ExecuteReader(CommandBehavior.CloseConnection))
+                    {
+                        while (reader.Read())
+                        {
+                            var autor = new Autor
+                            {
+                                Id = (int)reader["Id"],
+                                Nome = reader["Nome"].ToString(),
+                                Sobrenome = reader["Sobrenome"].ToString(),
+                                Email = reader["Email"].ToString(),
+                                DataNascimento = (DateTime)reader["DataNascimento"]
+                            };
+
+                            autores.Add(autor);
+                        }
+                    }
+                }
+                finally
+                {
+                    connection.Close();
+                }
+            }
+            return View(autores);
         }
 
         // GET: Autors/Details/5
@@ -35,7 +70,7 @@ namespace EditoraMVC.Controllers
                 return NotFound();
             }
 
-            var autor = await _context.autores
+            var autor = await _context.autores.Include(a => a.Livros)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (autor == null)
             {
@@ -56,29 +91,85 @@ namespace EditoraMVC.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Nome,Sobrenome,Email,DataNascimento")] Autor autor)
+        public ActionResult Create(Autor autor)
         {
-            if (ModelState.IsValid)
+            var autores = new List<Autor>();
+
+            using (var connection = new SqlConnection(connectionString))
             {
-                _context.Add(autor);
-                await _context.SaveChangesAsync();
+                var procName = "CreateAutor";
+                var sqlCommand = new SqlCommand(procName, connection);
+
+                sqlCommand.CommandType = CommandType.StoredProcedure;
+                sqlCommand.Parameters.AddWithValue("@Nome", autor.Nome);
+                sqlCommand.Parameters.AddWithValue("@Sobrenome", autor.Sobrenome);
+                sqlCommand.Parameters.AddWithValue("@Email", autor.Email);
+                sqlCommand.Parameters.AddWithValue("@DataNascimento", autor.DataNascimento);
+
+                try
+                {
+                    connection.Open();
+
+                    using (var reader = sqlCommand.ExecuteReader(CommandBehavior.CloseConnection))
+                    {
+                        if (reader.Read())
+                        {
+                            var novoAutor = new Autor
+                            {
+                                Nome = reader["Nome"].ToString(),
+                                Sobrenome = reader["Sobrenome"].ToString(),
+                                Email = reader["Email"].ToString(),
+                                DataNascimento = (DateTime)reader["DataNascimento"]
+                            };
+
+                            autores.Add(novoAutor);
+                        }
+                    }
+                }
+                finally
+                {
+                    connection.Close();
+                }
                 return RedirectToAction(nameof(Index));
             }
-            return View(autor);
         }
 
         // GET: Autors/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+        public ActionResult Edit(int id)
         {
-            if (id == null || _context.autores == null)
-            {
-                return NotFound();
-            }
+            Autor autor = null;
 
-            var autor = await _context.autores.FindAsync(id);
-            if (autor == null)
+            using (var connection = new SqlConnection(connectionString))
             {
-                return NotFound();
+                var procName = "GetAutor";
+                var sqlCommand = new SqlCommand(procName, connection);
+
+                sqlCommand.CommandType = CommandType.StoredProcedure;
+                sqlCommand.Parameters.AddWithValue("@Id", id);
+
+                try
+                {
+                    connection.Open();
+
+                    using (var reader = sqlCommand.ExecuteReader(CommandBehavior.CloseConnection))
+                    {
+                        if (reader.Read())
+                        {
+                            autor = new Autor
+                            {
+                                Id = (int)reader["Id"],
+                                Nome = reader["Nome"].ToString(),
+                                Sobrenome = reader["Sobrenome"].ToString(),
+                                Email = reader["Email"].ToString(),
+                                DataNascimento = (DateTime)reader["DataNascimento"]
+                            };
+                        }
+                    }
+                }
+                finally
+                {
+                    connection.Close();
+                }
             }
             return View(autor);
         }
@@ -88,70 +179,86 @@ namespace EditoraMVC.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Nome,Sobrenome,Email,DataNascimento")] Autor autor)
+        public ActionResult Edit(int id, Autor autor)
         {
-            if (id != autor.Id)
-            {
-                return NotFound();
-            }
+            Autor autorUpdate = null;
 
-            if (ModelState.IsValid)
+            using (var connection = new SqlConnection(connectionString))
             {
+                var procName = "UpdateAutor";
+                var sqlCommand = new SqlCommand(procName, connection);
+
+                sqlCommand.CommandType = CommandType.StoredProcedure;
+                sqlCommand.Parameters.AddWithValue("@Id", id);
+                sqlCommand.Parameters.AddWithValue("@Nome", autor.Nome);
+                sqlCommand.Parameters.AddWithValue("@Sobrenome", autor.Sobrenome);
+                sqlCommand.Parameters.AddWithValue("@Email", autor.Email);
+                sqlCommand.Parameters.AddWithValue("@DataNascimento", autor.DataNascimento);
+
                 try
                 {
-                    _context.Update(autor);
-                    await _context.SaveChangesAsync();
+                    connection.Open();
+
+                    using (var reader = sqlCommand.ExecuteReader(CommandBehavior.CloseConnection))
+                    {
+                        if (reader.Read())
+                        {
+                            autorUpdate = new Autor
+                            {
+                                Id = (int)reader["Id"],
+                                Nome = reader["Nome"].ToString(),
+                                Sobrenome = reader["Sobrenome"].ToString(),
+                                Email = reader["Email"].ToString(),
+                                DataNascimento = (DateTime)reader["DataNascimento"]
+                            };
+                        }
+                    }
                 }
-                catch (DbUpdateConcurrencyException)
+                finally
                 {
-                    if (!AutorExists(autor.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
+                    connection.Close();
                 }
-                return RedirectToAction(nameof(Index));
             }
-            return View(autor);
+            return RedirectToAction(nameof(Index));
         }
 
         // GET: Autors/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null || _context.autores == null)
-            {
-                return NotFound();
-            }
+            Autor autor = null;
 
-            var autor = await _context.autores
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (autor == null)
+            using (var connection = new SqlConnection(connectionString))
             {
-                return NotFound();
-            }
+                var procName = "DeleteAutor";
+                var sqlCommand = new SqlCommand(procName, connection);
 
-            return View(autor);
-        }
+                sqlCommand.CommandType = CommandType.StoredProcedure;
+                sqlCommand.Parameters.AddWithValue("@Id", id);
 
-        // POST: Autors/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            if (_context.autores == null)
-            {
-                return Problem("Entity set 'EditoraDbContext.autores'  is null.");
+                try
+                {
+                    connection.Open();
+
+                    using (var reader = sqlCommand.ExecuteReader(CommandBehavior.CloseConnection))
+                    {
+                        if (reader.Read())
+                        {
+                            autor = new Autor
+                            {
+                                Id = (int)reader["Id"],
+                                Nome = reader["Nome"].ToString(),
+                                Sobrenome = reader["Sobrenome"].ToString(),
+                                Email = reader["Email"].ToString(),
+                                DataNascimento = (DateTime)reader["DataNascimento"]
+                            };
+                        }
+                    }
+                }
+                finally
+                {
+                    connection.Close();
+                }
             }
-            var autor = await _context.autores.FindAsync(id);
-            if (autor != null)
-            {
-                _context.autores.Remove(autor);
-            }
-            
-            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
