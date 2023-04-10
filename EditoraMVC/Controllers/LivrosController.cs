@@ -27,11 +27,11 @@ namespace EditoraMVC.Controllers
         }
 
         // GET: Livros
-        public async Task<IActionResult> Index()
+        public ActionResult Index()
         {
-              return _context.livros != null ? 
-                          View(await _context.livros.ToListAsync()) :
-                          Problem("Entity set 'EditoraDbContext.livros'  is null.");
+            var livros = _context.livros.Include(l => l.Autores).ToList();
+
+            return View(livros);
         }
 
         // GET: Livros/Details/5
@@ -83,26 +83,6 @@ namespace EditoraMVC.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Titulo,ISBN,Ano")] Livro livro, IFormFile capa)
         {
-            //if (ModelState.IsValid)
-            //{
-            //    _context.Add(livro);
-
-            //    var fileName = Path.GetFileName(livro.Capa.FileName);
-            //    var fileType = Path.GetExtension(fileName);
-            //    var newFileName = String.Concat(Convert.ToString(Guid.NewGuid()), fileType);
-
-            //    BlobContainerClient container = new BlobContainerClient("DefaultEndpointsProtocol=https;AccountName=pbinfnet5;AccountKey=ge+96z23tmEU8//RQAV8QFhUp4zb9jhckK5nxfyrPKyspcgISqyfBwVP4CHVm7/Khbg/hVa/cZfQ+AStU6pQVQ==;EndpointSuffix=core.windows.net", "editora");
-
-            //    BlobClient client = container.GetBlobClient(newFileName);
-
-            //    using Stream stream = livro.Capa.OpenReadStream();
-            //    client.Upload(stream);
-            //    var fileUrl = client.Uri.AbsoluteUri;
-
-            //    await _context.SaveChangesAsync();
-            //    return RedirectToAction(nameof(Index));
-            //}
-            //return View(livro);
             if (ModelState.IsValid)
             {
                 byte[] bytes;
@@ -252,50 +232,7 @@ namespace EditoraMVC.Controllers
                 client.Upload(stream);
                 var fileUrl = client.Uri.AbsoluteUri;
             }
-            //var fileName = Path.GetFileName(foto.FileName);
-            //string fileExtension = Path.GetExtension(fileName);
-
-            //using MemoryStream fileUploadStream = new MemoryStream();
-            //foto.CopyTo(fileUploadStream);
-            //fileUploadStream.Position = 0;
-
-            //BlobContainerClient blobContainerClient = new BlobContainerClient("DefaultEndpointsProtocol=https;AccountName=pbinfnet5;AccountKey=ge+96z23tmEU8//RQAV8QFhUp4zb9jhckK5nxfyrPKyspcgISqyfBwVP4CHVm7/Khbg/hVa/cZfQ+AStU6pQVQ==;EndpointSuffix=core.windows.net", "editora");
-
-            //var uniqueName = Guid.NewGuid().ToString() + fileExtension;
-            //BlobClient blobClient = blobContainerClient.GetBlobClient(uniqueName);
-
-            //blobClient.Upload(fileUploadStream, new BlobUploadOptions()
-            //{
-            //    HttpHeaders = new BlobHttpHeaders
-            //    {
-            //        ContentType = "image/bitmap"
-            //    }
-            //}, cancellationToken: default);
         }
-
-
-        //comentario aula infnet
-        private static void UploadToAzure(string fileName, MemoryStream ms)
-        {
-            //PEGAR STRING DE CONEXAO NO PORTAL!!!!!!   
-            String azureBlobStorageConnection =
-                "DefaultEndpointsProtocol=https;AccountName=pbinfnet5;AccountKey=ge+96z23tmEU8//RQAV8QFhUp4zb9jhckK5nxfyrPKyspcgISqyfBwVP4CHVm7/Khbg/hVa/cZfQ+AStU6pQVQ==;EndpointSuffix=core.windows.net";
-            //Cria um serviço para o client do blob storage
-            BlobServiceClient blobServiceClient = new BlobServiceClient(azureBlobStorageConnection);
-
-            //Conecta ao container, já criado no portal
-            BlobContainerClient containerClient = blobServiceClient.GetBlobContainerClient("editora");
-
-            //Criar dinamicamente o nome do arquivo
-
-
-            //Criar a referencia indicando que é um novo arquivo
-            BlobClient blobClient = containerClient.GetBlobClient(fileName);
-
-            blobClient.Upload(ms);
-
-        }
-
     }
 
 }

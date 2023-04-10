@@ -49,7 +49,7 @@ app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Autors}/{action=Index}/{id?}");
+    pattern: "{controller=Livros}/{action=Index}/{id?}");
 app.MapRazorPages();
 
 app.Run();
